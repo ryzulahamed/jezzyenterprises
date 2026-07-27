@@ -198,17 +198,21 @@ export const authService = {
     const cleanEmail = email.trim().toLowerCase();
 
     if (isSupabaseConfigured && supabase) {
-      try {
-        const { error } = await supabase.auth.resetPasswordForEmail(cleanEmail, {
-          redirectTo: `${window.location.origin}/admin/reset-password-callback`,
-        });
-        if (!error) return true;
-      } catch (err) {
-        console.warn('Supabase resetPassword fallback:', err);
+      const redirectUrl = typeof window !== 'undefined' 
+        ? `${window.location.origin}/admin/reset-password-callback` 
+        : '/admin/reset-password-callback';
+
+      const { error } = await supabase.auth.resetPasswordForEmail(cleanEmail, {
+        redirectTo: redirectUrl,
+      });
+
+      if (error) {
+        throw new Error(`Supabase Auth: ${error.message}`);
       }
+      return true;
     }
 
-    // Built-in / Master Admin account validation
+    // Built-in / Master Admin account validation for offline mock mode
     if (MOCK_ACCOUNTS[cleanEmail] || cleanEmail.includes('admin') || cleanEmail.includes('@')) {
       return true;
     }
