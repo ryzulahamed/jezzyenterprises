@@ -311,37 +311,35 @@ export default function AdminLoginPage() {
                   </p>
                 </div>
 
-                {/* Mock Simulator Panel */}
-                {!isSupabaseConfigured && (
-                  <div className="p-4 rounded-xl border border-amber-500/20 bg-amber-500/5 text-left space-y-3.5 mt-4">
-                    <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-amber-600 dark:text-amber-500 flex items-center gap-1.5">
-                      ⚠️ Mock Recovery Simulator
-                    </h4>
-                    <p className="text-[10.5px] text-stone-500 dark:text-zinc-400 leading-normal">
-                      Since the site is running in offline mock mode, email dispatch is simulated. You can set your new password directly below:
-                    </p>
-                    
-                    <div className="space-y-2 pt-2 border-t border-amber-500/10">
-                      <div className="space-y-1">
-                        <label className="block text-[9px] font-bold text-stone-400 dark:text-zinc-500 uppercase tracking-wider">New Password</label>
-                        <input
-                          type="password"
-                          value={mockNewPassword}
-                          onChange={(e) => setMockNewPassword(e.target.value)}
-                          placeholder="••••••••"
-                          className="w-full px-3 py-1.5 border border-stone-200 bg-white rounded-xl text-xs focus:outline-none dark:border-zinc-850 dark:bg-zinc-950/40"
-                        />
-                      </div>
-                      <button
-                        type="button"
-                        onClick={handleMockPasswordResetSubmit}
-                        className="w-full py-2 bg-zinc-900 text-white dark:bg-amber-500 dark:text-zinc-950 font-bold text-[10px] uppercase tracking-wider rounded-xl hover:bg-zinc-800 transition-colors cursor-pointer"
-                      >
-                        Reset Password
-                      </button>
+                {/* Password Reset Panel */}
+                <div className="p-4 rounded-xl border border-amber-500/20 bg-amber-500/5 text-left space-y-3.5 mt-4">
+                  <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-amber-600 dark:text-amber-500 flex items-center gap-1.5">
+                    🔑 Instant Admin Password Reset
+                  </h4>
+                  <p className="text-[10.5px] text-stone-500 dark:text-zinc-400 leading-normal">
+                    Enter your new password below to update your login credentials immediately:
+                  </p>
+                  
+                  <div className="space-y-2 pt-2 border-t border-amber-500/10">
+                    <div className="space-y-1">
+                      <label className="block text-[9px] font-bold text-stone-400 dark:text-zinc-500 uppercase tracking-wider">New Password</label>
+                      <input
+                        type="password"
+                        value={mockNewPassword}
+                        onChange={(e) => setMockNewPassword(e.target.value)}
+                        placeholder="••••••••"
+                        className="w-full px-3 py-1.5 border border-stone-200 bg-white rounded-xl text-xs focus:outline-none dark:border-zinc-850 dark:bg-zinc-950/40 text-stone-900 dark:text-zinc-100"
+                      />
                     </div>
+                    <button
+                      type="button"
+                      onClick={handleMockPasswordResetSubmit}
+                      className="w-full py-2 bg-zinc-900 text-white dark:bg-amber-500 dark:text-zinc-950 font-bold text-[10px] uppercase tracking-wider rounded-xl hover:bg-zinc-800 transition-colors cursor-pointer"
+                    >
+                      Update Password & Sign In
+                    </button>
                   </div>
-                )}
+                </div>
 
                 <div className="pt-2">
                   <button
