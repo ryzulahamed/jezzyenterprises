@@ -177,7 +177,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const session = await authService.login(email, password, rememberMe);
       setUser(session);
       showToast('Logged in successfully. Welcome back!', 'success');
-      router.push('/admin/dashboard');
+      if (typeof window !== 'undefined') {
+        window.location.href = '/admin/dashboard';
+      } else {
+        router.push('/admin/dashboard');
+      }
     } catch (err: any) {
       showToast(err.message || 'Authentication failed. Please verify credentials.', 'error');
       throw err;

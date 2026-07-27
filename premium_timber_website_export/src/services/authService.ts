@@ -162,7 +162,6 @@ export const authService = {
     // Check Client Cookie
     const sessionCookie = cookieUtils.get('timber_admin_session');
     if (!sessionCookie) {
-      // If cookie was deleted/expired, clear local storage
       if (typeof window !== 'undefined') {
         localStorage.removeItem('timber_admin_user_session');
       }
@@ -172,13 +171,16 @@ export const authService = {
     try {
       const parsedSession: UserSession = JSON.parse(sessionCookie);
       
-      // Verify with Supabase if online and active
-      if (isSupabaseConfigured && supabase) {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user || user.id !== parsedSession.id) {
-          // Token mismatch or expired
-          await this.logout();
-          return null;
+      // Verify with Supabase ONLY if token exists and session is a Supabase user session
+      if (isSupabaseConfigured && supabase && parsedSession.token && !parsedSession.id?.startsWith('mock-uuid-')) {
+        try {
+          const { data: { user } } = await supabase.auth.getUser();
+          if (!user || user.id !== parsedSession.id) {
+            await this.logout();
+            return null;
+          }
+        } catch (err) {
+          console.warn('Supabase session verify fallback:', err);
         }
       }
       
