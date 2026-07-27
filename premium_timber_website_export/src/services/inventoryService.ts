@@ -335,49 +335,69 @@ export const inventoryService = {
     const registeredCountryName = await this.ensureCountryExists(container.countryId);
     const countryVal = registeredCountryName || container.countryId;
 
-    if (isSupabaseConfigured && supabase) {
-      const dbRow = {
-        container_number: container.container_number,
-        country_id: countryVal,
-        port_loading: container.portLoading,
-        port_arrival: container.portArrival,
-        species: container.species,
-        size: container.size,
-        logs_count: container.logsCount,
-        min_length: container.minLength,
-        max_length: container.maxLength,
-        avg_length: container.avgLength,
-        min_diameter: container.minDiameter,
-        max_diameter: container.maxDiameter,
-        avg_diameter: container.avgDiameter,
-        cft: container.cft,
-        grade: container.grade,
-        rate_per_cft: container.ratePerCft,
-        length_unit: container.lengthUnit || 'ft',
-        girth_unit: container.girthUnit || 'cm',
-        cbm: container.cbm || parseFloat((container.cft / 35.3147).toFixed(3)),
-        warehouse: container.warehouse,
-        arrival_date: container.arrivalDate,
-        price: container.price,
-        description: container.description,
-        special_notes: container.specialNotes,
-        status: container.status,
-        is_draft: container.isDraft,
-        images: container.images || []
-      };
+    const parseDbNum = (val: any): number => {
+      if (val === undefined || val === null || val === '') return 0;
+      if (typeof val === 'number') return val;
+      const num = parseFloat(val.toString().trim());
+      return isNaN(num) ? 0 : num;
+    };
 
-      const { data, error } = await supabase
-        .from('containers')
-        .insert([dbRow])
-        .select()
-        .single();
-      
-      if (error) throw error;
-      return data;
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const dbRow = {
+          container_number: container.container_number,
+          country_id: countryVal,
+          port_loading: container.portLoading,
+          port_arrival: container.portArrival,
+          species: container.species,
+          size: container.size,
+          logs_count: parseDbNum(container.logsCount),
+          min_length: parseDbNum(container.minLength),
+          max_length: parseDbNum(container.maxLength),
+          avg_length: parseDbNum(container.avgLength),
+          min_diameter: parseDbNum(container.minDiameter),
+          max_diameter: parseDbNum(container.maxDiameter),
+          avg_diameter: parseDbNum(container.avgDiameter),
+          cft: parseDbNum(container.cft),
+          grade: container.grade,
+          rate_per_cft: parseDbNum(container.ratePerCft),
+          length_unit: container.lengthUnit || 'ft',
+          girth_unit: container.girthUnit || 'cm',
+          cbm: parseDbNum(container.cbm),
+          warehouse: container.warehouse,
+          arrival_date: container.arrivalDate,
+          price: parseDbNum(container.price),
+          description: container.description,
+          special_notes: container.specialNotes,
+          status: container.status,
+          is_draft: container.isDraft,
+          images: container.images || []
+        };
+
+        const { data, error } = await supabase
+          .from('containers')
+          .insert([dbRow])
+          .select()
+          .single();
+        
+        if (!error && data) {
+          // Sync into local cache
+          this.initLocalStorage();
+          const str = typeof window !== 'undefined' ? localStorage.getItem('timber_inventory_containers') || '[]' : '[]';
+          const list = JSON.parse(str) || [];
+          list.push({ ...container, countryId: countryVal, id: container.container_number });
+          if (typeof window !== 'undefined') localStorage.setItem('timber_inventory_containers', JSON.stringify(list));
+          this.addActivityLog('CREATE_CONTAINER', `Created container ${container.container_number}`);
+          return data;
+        }
+      } catch (err) {
+        console.warn('Supabase addContainer fallback to local storage:', err);
+      }
     }
 
     this.initLocalStorage();
-    const list = JSON.parse(localStorage.getItem('timber_inventory_containers') || '[]');
+    const str = typeof window !== 'undefined' ? localStorage.getItem('timber_inventory_containers') || '[]' : '[]';
+    const list = JSON.parse(str) || [];
     const newContainer = {
       ...container,
       countryId: countryVal,
@@ -386,7 +406,9 @@ export const inventoryService = {
       updatedAt: new Date().toISOString()
     };
     list.push(newContainer);
-    localStorage.setItem('timber_inventory_containers', JSON.stringify(list));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('timber_inventory_containers', JSON.stringify(list));
+    }
     
     // Auto insert an activity log
     this.addActivityLog('CREATE_CONTAINER', `Created container ${container.container_number}`);
@@ -400,50 +422,70 @@ export const inventoryService = {
       countryVal = registeredCountryName || updates.countryId;
     }
 
+    const parseDbNum = (val: any): number => {
+      if (val === undefined || val === null || val === '') return 0;
+      if (typeof val === 'number') return val;
+      const num = parseFloat(val.toString().trim());
+      return isNaN(num) ? 0 : num;
+    };
+
     if (isSupabaseConfigured && supabase) {
-      const dbRow = {
-        container_number: updates.container_number,
-        country_id: countryVal,
-        port_loading: updates.portLoading,
-        port_arrival: updates.portArrival,
-        species: updates.species,
-        size: updates.size,
-        logs_count: updates.logsCount,
-        min_length: updates.minLength,
-        max_length: updates.maxLength,
-        avg_length: updates.avgLength,
-        min_diameter: updates.minDiameter,
-        max_diameter: updates.maxDiameter,
-        avg_diameter: updates.avgDiameter,
-        cft: updates.cft,
-        grade: updates.grade,
-        rate_per_cft: updates.ratePerCft,
-        length_unit: updates.lengthUnit || 'ft',
-        girth_unit: updates.girthUnit || 'cm',
-        cbm: updates.cbm || parseFloat((updates.cft / 35.3147).toFixed(3)),
-        warehouse: updates.warehouse,
-        arrival_date: updates.arrivalDate,
-        price: updates.price,
-        description: updates.description,
-        special_notes: updates.specialNotes,
-        status: updates.status,
-        is_draft: updates.isDraft,
-        images: updates.images
-      };
+      try {
+        const dbRow = {
+          container_number: updates.container_number,
+          country_id: countryVal,
+          port_loading: updates.portLoading,
+          port_arrival: updates.portArrival,
+          species: updates.species,
+          size: updates.size,
+          logs_count: parseDbNum(updates.logsCount),
+          min_length: parseDbNum(updates.minLength),
+          max_length: parseDbNum(updates.maxLength),
+          avg_length: parseDbNum(updates.avgLength),
+          min_diameter: parseDbNum(updates.minDiameter),
+          max_diameter: parseDbNum(updates.maxDiameter),
+          avg_diameter: parseDbNum(updates.avgDiameter),
+          cft: parseDbNum(updates.cft),
+          grade: updates.grade,
+          rate_per_cft: parseDbNum(updates.ratePerCft),
+          length_unit: updates.lengthUnit || 'ft',
+          girth_unit: updates.girthUnit || 'cm',
+          cbm: parseDbNum(updates.cbm),
+          warehouse: updates.warehouse,
+          arrival_date: updates.arrivalDate,
+          price: parseDbNum(updates.price),
+          description: updates.description,
+          special_notes: updates.specialNotes,
+          status: updates.status,
+          is_draft: updates.isDraft,
+          images: updates.images
+        };
 
-      const { data, error } = await supabase
-        .from('containers')
-        .update(dbRow)
-        .eq('id', id)
-        .select()
-        .single();
+        const { data, error } = await supabase
+          .from('containers')
+          .update(dbRow)
+          .or(`id.eq.${id},container_number.eq.${id}`)
+          .select();
 
-      if (error) throw error;
-      return data;
+        if (!error && data && data.length > 0) {
+          this.initLocalStorage();
+          const str = typeof window !== 'undefined' ? localStorage.getItem('timber_inventory_containers') || '[]' : '[]';
+          const list = JSON.parse(str) || [];
+          const idx = list.findIndex((c: any) => c.id?.toLowerCase() === id?.toLowerCase() || c.container_number?.toLowerCase() === id?.toLowerCase());
+          if (idx !== -1) {
+            list[idx] = { ...list[idx], ...updates, updatedAt: new Date().toISOString() };
+            if (typeof window !== 'undefined') localStorage.setItem('timber_inventory_containers', JSON.stringify(list));
+          }
+          return data[0];
+        }
+      } catch (err) {
+        console.warn('Supabase updateContainer fallback to local storage:', err);
+      }
     }
 
     this.initLocalStorage();
-    const list = JSON.parse(localStorage.getItem('timber_inventory_containers') || '[]');
+    const str = typeof window !== 'undefined' ? localStorage.getItem('timber_inventory_containers') || '[]' : '[]';
+    const list = JSON.parse(str) || [];
     const idx = list.findIndex((c: any) => c.id?.toLowerCase() === id?.toLowerCase() || c.container_number?.toLowerCase() === id?.toLowerCase());
     if (idx !== -1) {
       list[idx] = {

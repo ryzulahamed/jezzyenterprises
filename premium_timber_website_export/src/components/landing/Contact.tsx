@@ -49,7 +49,7 @@ export default function Contact() {
     const fetchContainers = async () => {
       try {
         const list = await inventoryService.getContainers();
-        const available = list.filter((c: any) => c.status === 'available');
+        const available = (list || []).filter((c: any) => c.status === 'available' && !c.isDraft);
         setContainers(available);
       } catch (err) {
         console.error('Error fetching containers:', err);
