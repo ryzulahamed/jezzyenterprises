@@ -464,19 +464,32 @@ export const inventoryService = {
   },
 
   async deleteContainer(id: string): Promise<boolean> {
+    const cleanId = (id || '').trim().toLowerCase();
+
     if (isSupabaseConfigured && supabase) {
-      const { error } = await supabase
-        .from('containers')
-        .update({ deleted_at: new Date().toISOString() })
-        .eq('id', id);
-      if (error) throw error;
-      return true;
+      try {
+        await supabase
+          .from('containers')
+          .update({ deleted_at: new Date().toISOString() })
+          .or(`id.eq.${id},container_number.eq.${id}`);
+      } catch (err) {
+        console.warn('Supabase delete error:', err);
+      }
     }
 
     this.initLocalStorage();
-    const list = JSON.parse(localStorage.getItem('timber_inventory_containers') || '[]');
-    const filtered = list.filter((c: any) => c.id?.toLowerCase() !== id?.toLowerCase());
-    localStorage.setItem('timber_inventory_containers', JSON.stringify(filtered));
+    const str = typeof window !== 'undefined' ? localStorage.getItem('timber_inventory_containers') || '[]' : '[]';
+    const list = JSON.parse(str) || [];
+    const filtered = list.filter((c: any) => {
+      const cId = (c.id || '').trim().toLowerCase();
+      const cNum = (c.container_number || '').trim().toLowerCase();
+      return cId !== cleanId && cNum !== cleanId;
+    });
+
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('timber_inventory_containers', JSON.stringify(filtered));
+    }
+
     this.addActivityLog('DELETE_CONTAINER', `Deleted container ${id} from catalog`);
     return true;
   },

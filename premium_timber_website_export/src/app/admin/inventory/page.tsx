@@ -41,7 +41,7 @@ export default function AdminInventoryPage() {
     if (!deleteTargetId) return;
     try {
       await inventoryService.deleteContainer(deleteTargetId);
-      setContainers(containers.filter(c => c.id !== deleteTargetId));
+      await fetchInventory();
       setDeleteTargetId(null);
     } catch (err) {
       console.error('Error deleting container:', err);
