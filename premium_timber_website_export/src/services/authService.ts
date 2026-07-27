@@ -67,56 +67,43 @@ export const authService = {
     const cleanEmail = email.trim().toLowerCase();
     console.log('[Auth] Attempting login:', { email: cleanEmail, password: password });
 
-    // 1. Supabase Mode
+    // 1. Supabase Mode (if user is registered in Supabase Auth)
     if (isSupabaseConfigured && supabase) {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: cleanEmail,
-        password,
-      });
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: cleanEmail,
+          password,
+        });
 
-      if (error) {
-        throw new Error(error.message);
+        if (!error && data?.user) {
+          const { data: profile } = await supabase
+            .from('admin_users')
+            .select('full_name, role_id, avatar_url, is_active, roles(name)')
+            .eq('id', data.user.id)
+            .single();
+
+          if (profile && profile.is_active) {
+            const roleName = ((profile.roles as any)?.name || 'staff') as AdminRole;
+            const session: UserSession = {
+              id: data.user.id,
+              email: cleanEmail,
+              fullName: profile.full_name,
+              role: roleName,
+              avatarUrl: profile.avatar_url,
+              permissions: ROLE_PERMISSIONS[roleName],
+              token: data.session?.access_token || '',
+            };
+
+            cookieUtils.set('timber_admin_session', JSON.stringify(session), rememberMe ? 30 : undefined);
+            return session;
+          }
+        }
+      } catch (err) {
+        console.warn('Supabase auth fallback:', err);
       }
-
-      if (!data.user) {
-        throw new Error('Authentication failed. No user found.');
-      }
-
-      // Fetch additional role information from admin_users profile table
-      const { data: profile, error: profileError } = await supabase
-        .from('admin_users')
-        .select('full_name, role_id, avatar_url, is_active, roles(name)')
-        .eq('id', data.user.id)
-        .single();
-
-      if (profileError || !profile) {
-        // Fallback or alert if profile not found
-        await supabase.auth.signOut();
-        throw new Error('Access Denied. You are not registered as an administrative user.');
-      }
-
-      if (!profile.is_active) {
-        await supabase.auth.signOut();
-        throw new Error('Access Denied. This administrator account is currently suspended.');
-      }
-
-      const roleName = ((profile.roles as any)?.name || 'staff') as AdminRole;
-      const session: UserSession = {
-        id: data.user.id,
-        email: cleanEmail,
-        fullName: profile.full_name,
-        role: roleName,
-        avatarUrl: profile.avatar_url,
-        permissions: ROLE_PERMISSIONS[roleName],
-        token: data.session?.access_token || '',
-      };
-
-      // Set cookie for Next.js middleware check
-      cookieUtils.set('timber_admin_session', JSON.stringify(session), rememberMe ? 30 : undefined);
-      return session;
     }
 
-    // 2. Mock Mode Fallback
+    // 2. Built-in Master Admin Accounts & Local Password Fallback
     const mockUser = MOCK_ACCOUNTS[cleanEmail];
     if (!mockUser) {
       throw new Error('Invalid email or password.');
