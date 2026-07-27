@@ -1,0 +1,339 @@
+@import "tailwindcss";
+
+/* Enable class-based dark mode in Tailwind v4 */
+@variant dark (&:where(.dark, .dark *));
+
+/* Mobile Optimization & Touch Target Rules */
+html {
+  -webkit-text-size-adjust: 100%;
+  touch-action: manipulation;
+}
+
+body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* Prevent auto-zoom on iOS inputs */
+@media screen and (max-width: 768px) {
+  input[type="text"],
+  input[type="number"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="password"],
+  input[type="date"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+:root {
+  --background: #fcfbf9; /* Warm stone-white */
+  --foreground: #1c1917; /* Deep wood charcoal */
+  --card: #ffffff;
+  --card-foreground: #1c1917;
+  --border: #e7e5e4;
+  --accent: #15803d; /* Premium Forest Green */
+  --accent-foreground: #fcfbf9;
+}
+
+.dark {
+  --background: #09090b; /* Pitch charcoal */
+  --foreground: #fafafa;
+  --card: #18181b;
+  --card-foreground: #fafafa;
+  --border: #27272a;
+  --accent: #10b981; /* Premium Emerald */
+  --accent-foreground: #09090b;
+}
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--color-card-foreground);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Outfit', sans-serif;
+
+  /* Premium Forest Green Theme overrides for amber scale */
+  --color-amber-50: #f0fdf4;
+  --color-amber-100: #dcfce7;
+  --color-amber-200: #bbf7d0;
+  --color-amber-300: #86efac;
+  --color-amber-400: #34d399;
+  --color-amber-500: #059669; /* Forest Emerald Accent */
+  --color-amber-600: #047857;
+  --color-amber-700: #065f46;
+  --color-amber-800: #064e3b;
+  --color-amber-900: #022c22;
+  --color-amber-950: #011c15;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+}
+
+/* Premium Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d6d3d1;
+  border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a29e;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #52525b;
+}
+
+/* Liquid Glass & Spatial UI Design System */
+.liquid-glass {
+  backdrop-filter: blur(32px) saturate(180%);
+  background: rgba(255, 255, 255, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow: 
+    0 1px 0 0 rgba(255, 255, 255, 0.7) inset, /* iOS razor top reflections */
+    0 12px 30px -10px rgba(0, 0, 0, 0.05),
+    0 1px 1px 0 rgba(0, 0, 0, 0.03);
+  position: relative;
+  overflow: hidden;
+}
+
+.liquid-glass::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    rgba(255, 255, 255, 0.05) 45%,
+    transparent 46%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+.dark .liquid-glass {
+  backdrop-filter: blur(32px) saturate(180%);
+  background: rgba(20, 20, 25, 0.48);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: 
+    0 1px 0 0 rgba(255, 255, 255, 0.15) inset, /* Subtle lit dark glass top edge */
+    0 20px 40px -15px rgba(0, 0, 0, 0.45),
+    0 1px 2px 0 rgba(0, 0, 0, 0.4);
+}
+
+.spatial-card {
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), 
+              box-shadow 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+              border-color 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+              background-color 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  will-change: transform, box-shadow;
+}
+
+.spatial-card:hover {
+  transform: scale(1.02);
+  box-shadow: 
+    0 20px 40px -10px rgba(0, 0, 0, 0.08),
+    0 0 24px -4px rgba(16, 185, 129, 0.15); /* Emerald spatial glow */
+  border-color: rgba(16, 185, 129, 0.25);
+}
+
+.dark .spatial-card:hover {
+  box-shadow: 
+    0 40px 80px -20px rgba(0, 0, 0, 0.5),
+    0 0 40px -5px rgba(16, 185, 129, 0.22); /* Glowing spatial aura */
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+/* Tactile iOS Control Center Bounce Feedback */
+.tactile-bounce {
+  transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.tactile-bounce:active {
+  transform: scale(0.96) translateY(1px);
+}
+
+.glass-panel {
+  backdrop-filter: blur(32px) saturate(180%);
+  background-color: rgba(255, 255, 255, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+}
+
+.dark .glass-panel {
+  backdrop-filter: blur(32px) saturate(180%);
+  background-color: rgba(20, 20, 25, 0.48);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+/* Growth log ring SVG dashboard card backgrounds */
+.wood-ring-bg {
+  background-image: radial-gradient(circle, rgba(217, 119, 6, 0.03) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Pulse animation for origins map */
+@keyframes map-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.4);
+    opacity: 0.4;
+  }
+}
+
+.animate-map-pulse {
+  animation: map-pulse 3s infinite ease-in-out;
+}
+
+/* Fade up layout entry animation helper */
+@keyframes fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Simple helper for hiding/showing elements on screen load */
+.fade-enter-active {
+  transition: opacity 300ms ease, transform 300ms ease;
+}
+
+/* Liquid Glow Mouse-Tracking Apple Style Spotlight Effect */
+.liquid-glow {
+  position: relative;
+  overflow: hidden;
+}
+
+.liquid-glow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: radial-gradient(
+    circle 250px at var(--mouse-x, 0px) var(--mouse-y, 0px),
+    rgba(16, 185, 129, 0.4),
+    transparent 80%
+  );
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: 10;
+}
+
+.liquid-glow:hover::before {
+  opacity: 1;
+}
+
+.liquid-glow::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle 350px at var(--mouse-x, 0px) var(--mouse-y, 0px),
+    rgba(16, 185, 129, 0.08),
+    transparent 80%
+  );
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: 1;
+}
+
+.liquid-glow:hover::after {
+  opacity: 1;
+}
+
+/* Premium Light-Up Button Effect */
+.btn-light-up {
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  overflow: hidden !important;
+}
+
+.btn-light-up:hover,
+.group:hover .btn-light-up {
+  background-color: #10b981 !important; /* Emerald primary green */
+  color: #ffffff !important;
+  box-shadow: 
+    0 0 15px 2px rgba(16, 185, 129, 0.45), /* Bright emerald glowing core */
+    0 0 30px 4px rgba(16, 185, 129, 0.2) !important;  /* Ambient glowing aura */
+  border-color: #34d399 !important;      /* Lighter neon emerald border */
+  transform: scale(1.035) !important;
+}
+
+.btn-light-up:active,
+.group:active .btn-light-up {
+  transform: scale(0.96) !important;
+}
+
+/* Glassmorphism shine overlay on hover */
+.btn-light-up::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.25),
+    transparent
+  );
+  transform: skewX(-25deg);
+  transition: none;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.btn-light-up:hover::before,
+.group:hover .btn-light-up::before {
+  left: 150%;
+  transition: left 0.8s ease-in-out !important;
+}
