@@ -10,13 +10,8 @@ export function middleware(request: NextRequest) {
   // 2. Routing Rules for Admin Portal
   if (pathname.startsWith('/admin')) {
     // If trying to access admin subpages without session
-    if (!sessionCookie && pathname !== '/admin/login' && pathname !== '/admin/reset-password-callback') {
+    if (!sessionCookie && pathname !== '/admin/login') {
       return NextResponse.redirect(new URL('/admin/login', request.url));
-    }
-
-    // If logged in and trying to access the login page, redirect to dashboard
-    if (sessionCookie && pathname === '/admin/login') {
-      return NextResponse.redirect(new URL('/admin/dashboard', request.url));
     }
   }
 
