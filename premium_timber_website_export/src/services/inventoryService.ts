@@ -291,7 +291,7 @@ export const inventoryService = {
     );
     
     if (found) {
-      return found.name;
+      return found.id;
     }
     
     // Auto-register new origin country into the system registry!
@@ -334,6 +334,9 @@ export const inventoryService = {
   async addContainer(container: any): Promise<any> {
     const registeredCountryName = await this.ensureCountryExists(container.countryId);
     const countryVal = registeredCountryName || container.countryId;
+    console.log("registeredCountryName=",registeredCountryName);
+    console.log("container.countryld=",container.countryld);
+    console.log("countryVal=",countryVal);
 
     const parseDbNum = (val: any): number => {
       if (val === undefined || val === null || val === '') return 0;

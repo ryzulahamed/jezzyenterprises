@@ -334,7 +334,7 @@ export default function AddContainerPage() {
                   >
                     <option value="">-- Quick Select Country --</option>
                     {countries.map(co => (
-                      <option key={co.id} value={co.name}>{co.flag || '🌐'} {co.name}</option>
+                      <option key={co.id} value={co.id}>{co.flag || '🌐'} {co.name}</option>
                     ))}
                     <option value="CUSTOM">✏️ Custom / Other Origin Country...</option>
                   </select>
