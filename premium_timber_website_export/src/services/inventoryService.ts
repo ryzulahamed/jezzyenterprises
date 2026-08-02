@@ -219,9 +219,12 @@ export const inventoryService = {
     if (isSupabaseConfigured && supabase) {
       try {
         const { data, error } = await supabase
+      
           .from('containers')
           .select('*, countries(name, flag)')
           .is('deleted_at', null);
+        console.log("Supabase data:",data);
+        console.log("Supabase error:",error);
         if (!error && data) {
           return data.map((item) => ({
             ...item,
