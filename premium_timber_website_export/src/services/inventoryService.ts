@@ -391,6 +391,7 @@ console.log("USER:", session?.user);
           .insert([dbRow])
           .select()
           .single();
+          console.log("DB ROW:",dbRow);
           console.log("INSERT DATA:", data);
 console.log("INSERT ERROR:", error);
 console.log("ERROR CODE:", error?.code);
