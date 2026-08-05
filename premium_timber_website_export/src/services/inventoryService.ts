@@ -226,7 +226,7 @@ export const inventoryService = {
         console.log("Supabase data:",data);
         console.log("Supabase error:",error);
         if (!error && data) {
-          return data.map((item) => ({
+          return data.map((item:any) => ({
             ...item,
             countryName: item.countries?.name || '',
             countryFlag: item.countries?.flag || '',
@@ -350,6 +350,12 @@ export const inventoryService = {
 
     if (isSupabaseConfigured && supabase) {
       try {
+        const {
+  data: { session },
+} = await supabase.auth.getSession();
+
+console.log("SESSION:", session);
+console.log("USER:", session?.user);
         const dbRow = {
           container_number: container.container_number,
           country_id: countryVal,
@@ -385,6 +391,10 @@ export const inventoryService = {
           .insert([dbRow])
           .select()
           .single();
+          console.log("INSERT DATA:", data);
+console.log("INSERT ERROR:", error);
+console.log("ERROR CODE:", error?.code);
+console.log("ERROR MESSAGE:", error?.message);
         
         if (!error && data) {
           // Sync into local cache
@@ -551,7 +561,7 @@ export const inventoryService = {
           .select('*')
           .order('created_at', { ascending: false });
         if (!error && data) {
-          return data.map(item => ({
+          return data.map((item:any) => ({
             ...item,
             customerName: item.customer_name || item.name,
             companyName: item.company_name,
@@ -655,7 +665,7 @@ export const inventoryService = {
           .select('*')
           .order('created_at', { ascending: false });
         if (!error && data) {
-          return data.map(item => ({
+          return data.map((item:any) => ({
             ...item,
             containerId: item.container_id,
             customerName: item.customer_name,
